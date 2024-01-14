@@ -1,13 +1,16 @@
 package net.protsenko.service.impl;
 
 import lombok.extern.log4j.Log4j;
+import net.protsenko.exceptions.UploadFileException;
 import net.protsenko.dao.AppUserDAO;
 import net.protsenko.dao.RawDataDAO;
+import net.protsenko.entity.AppDocument;
 import net.protsenko.entity.AppUser;
 import net.protsenko.entity.RawData;
-import net.protsenko.entity.UserState;
+import net.protsenko.service.FileService;
 import net.protsenko.service.MainService;
 import net.protsenko.service.ProducerService;
+import net.protsenko.service.enums.ServiceCommand;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,19 +18,24 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import static net.protsenko.entity.UserState.BASIC_STATE;
 import static net.protsenko.entity.UserState.WAIT_FOR_EMAIL_STATE;
-import static net.protsenko.service.enums.ServiceCommands.*;
+import static net.protsenko.service.enums.ServiceCommand.*;
 
-@Service
 @Log4j
+@Service
 public class MainServiceImpl implements MainService {
     private final RawDataDAO rawDataDAO;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
+    private final FileService fileService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO) {
+    public MainServiceImpl(RawDataDAO rawDataDAO,
+                           ProducerService producerService,
+                           AppUserDAO appUserDAO,
+                           FileService fileService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
+        this.fileService = fileService;
     }
 
     @Override
@@ -38,12 +46,13 @@ public class MainServiceImpl implements MainService {
         var text = update.getMessage().getText();
         var output = "";
 
-        if (CANCEL.equals(text)) {
+        var serviceCommand = ServiceCommand.fromValue(text);
+        if (CANCEL.equals(serviceCommand)) {
             output = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            //TODO добавить обработку имейла
+            //TODO добавить обработку емейла
         } else {
             log.error("Unknown user state: " + userState);
             output = "Неизвестная ошибка! Введите /cancel и попробуйте снова!";
@@ -62,9 +71,17 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        //TODO добавить сохранение документа
-        var answer = "Документ успешно загружен! Ссылка для скачивания: аааааааа";
-        sendAnswer(answer, chatId);
+        try {
+            AppDocument doc = fileService.processDoc(update.getMessage());
+            //TODO Добавить генерацию ссылки для скачивания документа
+            var answer = "Документ успешно загружен! "
+                    + "Ссылка для скачивания: http://test.ru/get-doc/777";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex);
+            String error = "К сожалению, загрузка файла не удалась. Повторите попытку позже.";
+            sendAnswer(error, chatId);
+        }
     }
 
     @Override
@@ -76,19 +93,21 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        //TODO добавить сохранение фото
-        var answer = "Фото успешно загружено! Ссылка для скачивания: аааааааа";
+        //TODO добавить сохранения фото :)
+        var answer = "Фото успешно загружено! "
+                + "Ссылка для скачивания: http://test.ru/get-photo/777";
         sendAnswer(answer, chatId);
     }
 
     private boolean isNotAllowToSendContent(Long chatId, AppUser appUser) {
         var userState = appUser.getState();
         if (!appUser.getIsActive()) {
-            var error = "Зарегистрируйтесь или активируйте свою учетную запись для загрузки контента.";
+            var error = "Зарегистрируйтесь или активируйте "
+                    + "свою учетную запись для загрузки контента.";
             sendAnswer(error, chatId);
             return true;
         } else if (!BASIC_STATE.equals(userState)) {
-            var error = "Отмените текущую команду с помощью /cancel для отправки файлов";
+            var error = "Отмените текущую команду с помощью /cancel для отправки файлов.";
             sendAnswer(error, chatId);
             return true;
         }
@@ -103,12 +122,13 @@ public class MainServiceImpl implements MainService {
     }
 
     private String processServiceCommand(AppUser appUser, String cmd) {
-        if (REGISTRATION.equals(cmd)) {
+        var serviceCommand = ServiceCommand.fromValue(cmd);
+        if (REGISTRATION.equals(serviceCommand)) {
             //TODO добавить регистрацию
-            return "Временно недоступно";
-        } else if (HELP.equals(cmd)) {
+            return "Временно недоступно.";
+        } else if (HELP.equals(serviceCommand)) {
             return help();
-        } else if (START.equals(cmd)) {
+        } else if (START.equals(serviceCommand)) {
             return "Приветствую! Чтобы посмотреть список доступных команд введите /help";
         } else {
             return "Неизвестная команда! Чтобы посмотреть список доступных команд введите /help";
@@ -127,7 +147,7 @@ public class MainServiceImpl implements MainService {
         return "Команда отменена!";
     }
 
-    public AppUser findOrSaveAppUser(Update update) {
+    private AppUser findOrSaveAppUser(Update update) {
         User telegramUser = update.getMessage().getFrom();
         AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
         if (persistentAppUser == null) {
@@ -136,6 +156,7 @@ public class MainServiceImpl implements MainService {
                     .userName(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
+                    //TODO изменить значение по умолчанию после добавления регистрации
                     .isActive(true)
                     .state(BASIC_STATE)
                     .build();
