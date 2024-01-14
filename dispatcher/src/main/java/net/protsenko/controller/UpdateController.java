@@ -59,7 +59,7 @@ public class UpdateController {
 
     private void setFileIsReceivedView(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update,
-                "Файл получен, производится обработка!");
+                "Файл получен! Обрабатывается...");
         setView(sendMessage);
     }
 
@@ -79,6 +79,5 @@ public class UpdateController {
 
     private void processTextMessage(Update update) {
         updateProducer.produce(TEXT_MESSAGE_UPDATE, update);
-        setFileIsReceivedView(update);
     }
 }

@@ -1,6 +1,7 @@
 package net.protsenko.entity;
 
 import lombok.*;
+import net.protsenko.entity.enums.UserState;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -23,7 +24,7 @@ public class AppUser {
     private LocalDateTime firstLoginDate;
     private String firstName;
     private String lastName;
-    private String userName;
+    private String username;
     private String email;
     private Boolean isActive;
     @Enumerated(EnumType.STRING)

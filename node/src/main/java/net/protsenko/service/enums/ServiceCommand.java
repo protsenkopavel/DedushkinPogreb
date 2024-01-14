@@ -16,10 +16,10 @@ public enum ServiceCommand {
         return value;
     }
 
-    public static ServiceCommand fromValue(String value) {
-        for (ServiceCommand command : ServiceCommand.values()) {
-            if (command.value.equals(value)) {
-                return command;
+    public static ServiceCommand fromValue(String v) {
+        for (ServiceCommand c: ServiceCommand.values()) {
+            if (c.value.equals(v)) {
+                return c;
             }
         }
         return null;

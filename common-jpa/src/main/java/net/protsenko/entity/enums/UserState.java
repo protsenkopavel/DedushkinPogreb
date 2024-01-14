@@ -1,4 +1,4 @@
-package net.protsenko.entity;
+package net.protsenko.entity.enums;
 
 public enum UserState {
     BASIC_STATE,

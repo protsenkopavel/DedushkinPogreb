@@ -35,3 +35,24 @@
 2024-01-14 20:25:51 DEBUG UpdateProducerImpl:20 - /help
 2024-01-14 20:25:54 DEBUG UpdateProducerImpl:20 - /cancel
 2024-01-14 20:26:57 DEBUG UpdateProducerImpl:20 - 
+2024-01-14 23:28:45 DEBUG UpdateProducerImpl:20 - 
+2024-01-14 23:29:29 DEBUG UpdateProducerImpl:20 - /help
+2024-01-14 23:29:33 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-14 23:32:43 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:02:56 DEBUG UpdateProducerImpl:20 - !
+2024-01-15 00:03:01 DEBUG UpdateProducerImpl:20 - /cancel
+2024-01-15 00:03:06 DEBUG UpdateProducerImpl:20 - /help
+2024-01-15 00:03:09 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:03:19 DEBUG UpdateProducerImpl:20 - pavelprotsenko@outlook.com
+2024-01-15 00:03:37 DEBUG UpdateProducerImpl:20 - protsenko@ingenium-company.ru
+2024-01-15 00:03:42 DEBUG UpdateProducerImpl:20 - /help
+2024-01-15 00:03:44 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:06:31 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:06:54 DEBUG UpdateProducerImpl:20 - /help
+2024-01-15 00:06:55 DEBUG UpdateProducerImpl:20 - /cancel
+2024-01-15 00:06:58 DEBUG UpdateProducerImpl:20 - /help
+2024-01-15 00:07:00 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:07:35 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:07:39 DEBUG UpdateProducerImpl:20 - protsenko@ingenium-company.ru
+2024-01-15 00:10:12 DEBUG UpdateProducerImpl:20 - /registration
+2024-01-15 00:10:20 DEBUG UpdateProducerImpl:20 - protsenko@ingenium-company.ru

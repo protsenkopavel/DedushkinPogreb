@@ -41,7 +41,8 @@ public class FileServiceImpl implements FileService {
     private final BinaryContentDAO binaryContentDAO;
     private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, CryptoTool cryptoTool) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO,
+                           CryptoTool cryptoTool) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
         this.binaryContentDAO = binaryContentDAO;
@@ -147,6 +148,6 @@ public class FileServiceImpl implements FileService {
     @Override
     public String generateLink(Long docId, LinkType linkType) {
         var hash = cryptoTool.hashOf(docId);
-        return "http://" + linkAddress + "/" + linkType + "?id" + hash;
+        return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
     }
 }
