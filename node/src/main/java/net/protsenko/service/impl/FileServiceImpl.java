@@ -9,6 +9,8 @@ import net.protsenko.dao.BinaryContentDAO;
 import net.protsenko.entity.AppDocument;
 import net.protsenko.entity.BinaryContent;
 import net.protsenko.service.FileService;
+import net.protsenko.service.enums.LinkType;
+import net.protsenko.utils.CryptoTool;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -32,14 +34,18 @@ public class FileServiceImpl implements FileService {
     private String fileInfoUri;
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
+    @Value("${link.address}")
+    private String linkAddress;
     private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final BinaryContentDAO binaryContentDAO;
+    private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, CryptoTool cryptoTool) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
         this.binaryContentDAO = binaryContentDAO;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
@@ -136,5 +142,11 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             throw new UploadFileException(urlObj.toExternalForm(), e);
         }
+    }
+
+    @Override
+    public String generateLink(Long docId, LinkType linkType) {
+        var hash = cryptoTool.hashOf(docId);
+        return "http://" + linkAddress + "/" + linkType + "?id" + hash;
     }
 }
