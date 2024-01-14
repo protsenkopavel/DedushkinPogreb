@@ -1,6 +1,7 @@
 package net.protsenko.service.impl;
 
 import lombok.extern.log4j.Log4j;
+import net.protsenko.entity.AppPhoto;
 import net.protsenko.exceptions.UploadFileException;
 import net.protsenko.dao.AppUserDAO;
 import net.protsenko.dao.RawDataDAO;
@@ -91,6 +92,18 @@ public class MainServiceImpl implements MainService {
         var chatId = update.getMessage().getChatId();
         if (isNotAllowToSendContent(chatId, appUser)) {
             return;
+        }
+
+        try {
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            //TODO Добавить генерацию ссылки для скачивания фото
+            var answer = "Фото успешно загружено! "
+                    + "Ссылка для скачивания: http://test.ru/get-doc/777";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex);
+            String error = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
+            sendAnswer(error, chatId);
         }
 
         //TODO добавить сохранения фото :)
